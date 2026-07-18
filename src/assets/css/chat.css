@@ -1,0 +1,7 @@
+.chat-page {
+    height: calc(100vh - 64px);
+}
+
+.chat-page .row {
+    height: 100%;
+}
