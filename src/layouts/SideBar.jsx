@@ -22,7 +22,7 @@ const SideBar = () => {
                 className="app-brand-link"
                 >
                 <span className="app-brand-text fw-bold">
-                    POD
+                    AI ASA
                 </span>
                 </NavLink>
             </div>

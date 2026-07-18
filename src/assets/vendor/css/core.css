@@ -25713,6 +25713,7 @@ li:not(:first-child) .dropdown-item, .dropdown-menu .dropdown-item:not(:first-ch
   padding-inline: calc(var(--bs-menu-vertical-link-padding-x) * 2.1333);
 }
 .menu .app-brand .app-brand-text {
+  font-size: xx-large;
   color: var(--bs-heading-color);
 }
 .menu .app-brand .layout-menu-toggle {
