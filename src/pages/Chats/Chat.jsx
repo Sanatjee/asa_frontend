@@ -1,9 +1,11 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import chatService from "../../services/chatService";
 import Toast from "../../components/Toast";
 import DeleteModal from "../../components/DeleteModal";
 import '../../assets/css/chat.css'
 import { formatChatTime } from "../../utils/dateFormatter";
+import useAuth from "../../hooks/useAuth";
+import Permission from "../../components/Permission";
 
 const Program = () => {
     const [sessions, setSessions] = useState([]);
@@ -14,10 +16,10 @@ const Program = () => {
     const [isResolved, setIsResolved] = useState(false);
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [sessionToDelete, setSessionToDelete] = useState(null);
+    const [sessionToDelete, setSessionToDelete] = useState(null);   
 
     const messagesContainerRef = useRef(null);
-    
+
 
     const scrollToBottom = (behavior = "smooth") => {
         const container = messagesContainerRef.current;
@@ -35,6 +37,16 @@ const Program = () => {
         message: "",
         type: "success",
     });
+
+    const { hasPermission,user } = useAuth();
+
+    const canResolve = hasPermission("chat.resolve");
+
+    const replyingUser = selectedSession && selectedSession.user_id !== user.id && 
+                         canResolve ? "support" : "user";
+    
+    const isSupportView = selectedSession && selectedSession.user_id !== user.id && canResolve;
+
 
     useEffect(() => {
         loadSessions();
@@ -69,7 +81,6 @@ const Program = () => {
         }
     };
 
-    ;
 
     const loadSessions = async () => {
         const res = await chatService.getSessions();
@@ -102,13 +113,39 @@ const Program = () => {
         }
     };
 
+    const determinMessage = (msg) => {
+        if (replyingUser === "support") {
+            return (
+                msg.sender === "assistant" ||
+                msg.sender === "support"
+            );
+        }
+
+        return msg.sender === "user";
+    };
+
     const sendMessage = async () => {
-        if (!message.trim()) return;
+    if (!message.trim() || !selectedSession) return;
 
-        setLoading(true);
+    setLoading(true);
 
-        try {
-            const res = await chatService.sendMessage(
+    try {
+        let res;
+
+        if (isSupportView) {
+            // Support replying to applicant
+            res = await chatService.sendSupportReply(
+                selectedSession.id,
+                { message }
+            );
+
+            setMessages(prev => [
+                ...prev,
+                res.data.data.message,
+            ]);
+        } else {
+            // Normal AI conversation
+            res = await chatService.sendMessage(
                 selectedSession.id,
                 { message }
             );
@@ -118,16 +155,18 @@ const Program = () => {
                 res.data.data.user_message,
                 res.data.data.assistant_message,
             ]);
-
-            setSelectedSession(res.data.data.session);
-
-            setMessage("");
-
-            await loadSessions();
-        } finally {
-            setLoading(false);
         }
-    };
+
+        setSelectedSession(res.data.data.session);
+        setMessage("");
+
+        await loadSessions();
+    } catch (error) {
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+};
 
 
     const resolveChat = async () => {
@@ -296,7 +335,7 @@ const Program = () => {
                         <h5 className="mb-0">
                             AI Program Assistant
                         </h5>
-
+                        <Permission permission="chat.resolve">
                         {selectedSession && (
                             <button
                                 className="btn btn-success"
@@ -305,6 +344,7 @@ const Program = () => {
                                 Resolve Chat
                             </button>
                         )}
+                        </Permission>
                     </div>
 
                     <div
@@ -316,37 +356,47 @@ const Program = () => {
                         }}
                     >
                         {messages.map((msg) => (
+
                             <div
                                 key={msg.id}
-                                className={`mb-3 d-flex ${msg.sender === "user"
-                                    ? "justify-content-end"
-                                    : "justify-content-start"
+                                className={`mb-3 d-flex ${determinMessage(msg)
+                                        ? "justify-content-end"
+                                        : "justify-content-start"
                                     }`}
                             >
                                 <div
-                                    className={`p-3 rounded ${msg.sender === "user"
-                                        ? "bg-primary text-white"
-                                        : "bg-light"
+                                    className={`p-3 rounded ${determinMessage(msg)
+                                            ? "bg-primary text-white"
+                                            : "bg-light border"
                                         }`}
                                     style={{
                                         maxWidth: "70%",
                                     }}
                                 >
-                                    {msg.message}
+                                    <div
+                                        className={`fw-bold mb-1 ${determinMessage(msg)
+                                                ? "text-white"
+                                                : "text-primary"
+                                            }`}
+                                        style={{ fontSize: "13px" }}
+                                    >
+                                        {/* {getMessageLabel(msg)} */}
+                                    </div>
+
+                                    <div>{msg.message}</div>
+
                                     <small
-                                    className={`d-block mt-1  ${msg.sender === "user"
-                                            ? "text-end text-muted"
-                                            : "text-muted text-start"
-                                        }`}
-                                    style={{
-                                        fontSize: "12px",
-                                        opacity: 0.9,
-                                    }}
-                                >
-                                    {formatChatTime(msg.created_at)}
-                                </small>
+                                        className={`d-block mt-2 ${determinMessage(msg)
+                                                ? "text-end text-white-50"
+                                                : "text-muted"
+                                            }`}
+                                        style={{
+                                            fontSize: "11px",
+                                        }}
+                                    >
+                                        {formatChatTime(msg.created_at)}
+                                    </small>
                                 </div>
-                                
                             </div>
                         ))}
 
@@ -355,7 +405,7 @@ const Program = () => {
                                 AI is typing...
                             </div>
                         )}
-                        
+
                     </div>
                     {isResolved && (
 

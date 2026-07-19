@@ -16,6 +16,10 @@ const sendMessage = (id,data) => {
   return api.post(`/chat-sessions/${id}/messages`, data);
 };
 
+const sendSupportReply = (sessionId, data) => {
+    return api.post(`/chat-sessions/${sessionId}/support-reply`, data);
+};
+
 const resolve = (id) => {
   return api.patch(`/chat-sessions/${id}/resolve`);
 };
@@ -30,6 +34,7 @@ export default {
     getSingleSession,
     createSession,
     sendMessage,
+    sendSupportReply,
     resolve,
     deleteSession,
 };
