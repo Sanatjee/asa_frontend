@@ -6,7 +6,7 @@ const dashboardStats = [
         color: "primary",
     },
     {
-        title: "Active Sessions",
+        title: "Unresolved Sessions",
         res_key: "active_sessions",
         icon: "bx bx-chat",
         color: "warning",

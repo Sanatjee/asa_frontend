@@ -17,6 +17,12 @@ const sidebarMenu = [
     icon: 'bx bx-user',
     permission: 'user.view',
   },
+  {
+    title: 'Roles & Permissions',
+    path: '/roles-and-permissions',
+    icon: 'bx bx-shield-quarter',
+    permission: 'role.permission.manage',
+  },
 ];
 
 export default sidebarMenu;

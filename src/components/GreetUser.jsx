@@ -30,7 +30,7 @@ const GreetUser = () => {
           <div className="card-body pb-0 px-0 px-md-6">
             <img
               src={userImage}
-              height={175}
+              height={122}
               alt="User"
             />
           </div>

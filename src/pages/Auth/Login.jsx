@@ -56,11 +56,11 @@ const Login = () => {
           <div className="card px-sm-6 px-0">
             <div className="card-body">
               <h4 className="mb-1">
-                Welcome to ASA!
+                Welcome to AI Applicant Support Portal!
               </h4>
 
               <p className="mb-6">
-                Please sign in to your account
+                Educational Outreach | IIT Bombay
               </p>
 
               {error && (

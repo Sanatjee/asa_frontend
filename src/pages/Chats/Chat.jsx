@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import chatService from "../../services/chatService";
 import Toast from "../../components/Toast";
 import DeleteModal from "../../components/DeleteModal";
 import '../../assets/css/chat.css'
+import { formatChatTime } from "../../utils/dateFormatter";
 
 const Program = () => {
     const [sessions, setSessions] = useState([]);
@@ -15,6 +16,20 @@ const Program = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [sessionToDelete, setSessionToDelete] = useState(null);
 
+    const messagesContainerRef = useRef(null);
+    
+
+    const scrollToBottom = (behavior = "smooth") => {
+        const container = messagesContainerRef.current;
+
+        if (!container) return;
+
+        container.scrollTo({
+            top: container.scrollHeight,
+            behavior: "smooth",
+        });
+    };
+
     const [toast, setToast] = useState({
         show: false,
         message: "",
@@ -24,6 +39,20 @@ const Program = () => {
     useEffect(() => {
         loadSessions();
     }, []);
+
+    // Scroll immediately when a different chat session is opened
+    useEffect(() => {
+        if (selectedSession) {
+            scrollToBottom("auto");
+        }
+    }, [selectedSession]);
+
+    // Smooth scroll whenever new messages are added
+    useEffect(() => {
+        if (messages.length > 0) {
+            scrollToBottom("smooth");
+        }
+    }, [messages]);
 
     const getStatusClass = (session) => {
 
@@ -178,8 +207,8 @@ const Program = () => {
                             <div
                                 key={session.id}
                                 className={`card shadow-sm mb-3 ${selectedSession?.id === session.id
-                                        ? "border-primary border-2"
-                                        : ""
+                                    ? "border-primary border-2"
+                                    : ""
                                     }`}
                             >
                                 <div
@@ -222,10 +251,10 @@ const Program = () => {
 
                                         <span
                                             className={`badge ${session.resolution_flag === "resolved"
-                                                    ? "bg-success"
-                                                    : session.resolution_flag === "followup"
-                                                        ? "bg-danger"
-                                                        : "bg-warning text-dark"
+                                                ? "bg-success"
+                                                : session.resolution_flag === "followup"
+                                                    ? "bg-danger"
+                                                    : "bg-warning text-dark"
                                                 }`}
                                         >
                                             {session.resolution_flag === "resolved"
@@ -279,6 +308,7 @@ const Program = () => {
                     </div>
 
                     <div
+                        ref={messagesContainerRef}
                         className="flex-grow-1 overflow-auto p-3"
                         style={{
                             minHeight: 0,
@@ -303,7 +333,20 @@ const Program = () => {
                                     }}
                                 >
                                     {msg.message}
+                                    <small
+                                    className={`d-block mt-1  ${msg.sender === "user"
+                                            ? "text-end text-muted"
+                                            : "text-muted text-start"
+                                        }`}
+                                    style={{
+                                        fontSize: "12px",
+                                        opacity: 0.9,
+                                    }}
+                                >
+                                    {formatChatTime(msg.created_at)}
+                                </small>
                                 </div>
+                                
                             </div>
                         ))}
 
@@ -312,6 +355,7 @@ const Program = () => {
                                 AI is typing...
                             </div>
                         )}
+                        
                     </div>
                     {isResolved && (
 

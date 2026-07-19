@@ -6,6 +6,7 @@ import Users from '../pages/Users/Users';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ProtectedRoute from './ProtectedRoute';
 import Chat from '../pages/Chats/Chat';
+import RolePermissionPage from '../pages/RBAC/RolePermissionPage';
 
 function AppRoutes() {
   return (
@@ -29,6 +30,11 @@ function AppRoutes() {
           <Route
             path="/chats"
             element={<Chat />}
+          />
+
+           <Route
+            path="/roles-and-permissions"
+            element={<RolePermissionPage />}
           />
           
         </Route>
