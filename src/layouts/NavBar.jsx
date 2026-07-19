@@ -38,7 +38,7 @@ const NavBar = () => {
                             AI Applicant Support Dashboard
                         </h4>
                         <small className="text-muted">
-                            Intelligent assistance for admissions, program information and applicant queries
+                            Overview of conversations, queries and support activities
                         </small>
                     </div>
                 </div>

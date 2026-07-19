@@ -30,6 +30,7 @@ const SessionTrend = ({ trend = [] }) => {
             {
                 label: "Sessions",
                 data: trend.map((t) => t.count),
+                backgroundColor: "#437ed5",
             },
         ],
     };

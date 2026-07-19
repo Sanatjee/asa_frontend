@@ -9,6 +9,8 @@ import dashboardService from "../../services/dashboardService";
 import RecentConversations from "../../components/RecentConversations";
 import SessionTrend from "../../components/SessionTrend";
 import Permission from "../../components/Permission";
+import ResolutionTrend from "../../components/ResolutionTrend";
+import CategoryTrend from "../../components/CategoryTrend";
 
 const Dashboard = () => {
 
@@ -63,23 +65,42 @@ const Dashboard = () => {
               </div>
 
               <div className="row mt-4">
+                <div className="col-lg-6">
 
-                  <div className="col-lg-12">
-
-                      <RecentConversations
-                          sessions={
-                              metrics.recent_conversations ??
+                      <CategoryTrend
+                          data={
+                              metrics.category_trend ??
                               []
                           }
                       />
 
                   </div>
 
-                  <div className="col-lg-12 mt-4">
+                  <div className="col-lg-6">
 
                       <SessionTrend
                           trend={
                               metrics.session_trend ??
+                              []
+                          }
+                      />
+
+                  </div>
+                  <div className="col-lg-6">
+
+                      <ResolutionTrend
+                          data={
+                              metrics.resolution_trend ??
+                              []
+                          }
+                      />
+
+                  </div>
+                  <div className="col-lg-6">
+
+                      <RecentConversations
+                          sessions={
+                              metrics.recent_conversations ??
                               []
                           }
                       />
